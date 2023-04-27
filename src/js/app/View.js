@@ -11,7 +11,8 @@ export default class View {
     this.#model = null;
     this.#controller = null;
     this.#app = getElement('#app');
-    this.#callout = new Callout();
+
+    this.#callout = new Callout(); // initialized CallOut view
   }
 
   setModel(model) {
@@ -23,11 +24,11 @@ export default class View {
   }
 
   closeCallout() {
-    this.#callout.closeCallOut();
+    this.#callout.closeCallOut(); // manipulate Callout from View Layer
   }
 
   openCallout() {
-    this.#callout.openCallOut();
+    this.#callout.openCallOut(); // manipulate Callout from View Layer
   }
 
   async render() {
@@ -35,17 +36,20 @@ export default class View {
     main.id = 'main';
     const mapDom = createElement('div');
     mapDom.id = 'map';
-    const map = new Map();
-    map.setController(this.#controller);
-    map.setModel(this.#model);
-    await map.render(mapDom, this.#model.getEqData());
 
-    this.#callout.setModel(this.#model)
-    this.#callout.render();
+    const map = new Map(); // initialized Map view
+    
+    map.setController(this.#controller);
+    await map.render(mapDom, this.#model.getEqData()); // trigger initial map render
+
+    // add views to observers
+    this.#model.addObserver(map)
+    this.#model.addObserver(this.#callout)
+
+    this.#callout.render(); // trigger initial callout
 
     main.append(mapDom);
 
-    this.#app.append(this.#callout.aside, main);
+    this.#app.append(main, this.#callout.aside); // append all doms
   }
-
 }

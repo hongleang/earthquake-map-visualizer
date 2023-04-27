@@ -16,6 +16,8 @@ describe('Model class', () => {
 
   describe('the setSelectedData() method', () => {
     it('should notify other view of the selectedData update', () => {
+      // Each View object(observe) should have update function
+      // All observe would be called when the model is changing
       const updateFunc = jest.fn((updateData) => 'Update view to ' + updateData);
       const view = {
         update: updateFunc

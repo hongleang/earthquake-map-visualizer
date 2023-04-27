@@ -16,7 +16,7 @@ const app = (function () {
   const model = new Model();
   const view = new View();
   const controller = new Controller();
-
+  
   return {
     init: async function () {
       // Initialized the app

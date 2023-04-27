@@ -7,7 +7,6 @@ export default class Map {
   #loader;
   #position;
   #controller;
-  #model;
   #infoWindow
   #infoWindowContent
 
@@ -22,11 +21,6 @@ export default class Map {
 
   setController(controller) {
     this.#controller = controller;
-  }
-
-  setModel(model) {
-    this.#model = model;
-    this.#model.addObserver(this); // add the object to the observer
   }
 
   /* Loads all the necessary libraries */
@@ -54,9 +48,9 @@ export default class Map {
     const mapOptions = {
       center: this.#position,
       zoom: 2,
+      // restrict user control
       zoomControl: true,
       mapTypeControl: false,
-      // scaleControl: boolean,
       streetViewControl: false,
       rotateControl: false,
       fullscreenControl: false,
@@ -65,7 +59,7 @@ export default class Map {
       }
     }
 
-    this.#map = new Map(mapDom, mapOptions);
+    this.#map = new Map(mapDom, mapOptions); // initialized map
     this.#map.data.addGeoJson(mapData) // add data to google data layer
     this.#map.mapTypes.set("styled_map", styledMapType); // add custom json style to map style
     this.#map.setMapTypeId("styled_map"); // set custom style as default style
@@ -94,7 +88,9 @@ export default class Map {
   // update(newData) is called in controller when the observer is notified
   update(newData) {
     const { feature, position } = newData
+
     this.#createInfoWindow(feature);
+
     this.#map.setZoom(3);
     this.#map.panTo(position);
 
@@ -134,18 +130,19 @@ export default class Map {
   }
 
   async #bindMapEvents() {
-
+    // map has data layer that can add event listener through its addListener() method
     this.#map.data.addListener('click', (event) => {
-      this.#controller.onCloseCallout();
-      this.#controller.onMapClick({ feature: event.feature.j, position: event.latLng }) // Set selected data     
+      this.#controller.onCloseCallout(); // close previous callout for every new click
+      this.#controller.onMapClick({ feature: event.feature.h, position: event.latLng }) // Set selected data
     });
 
     this.#map.addListener('click', () => {
-      this.#infoWindow.close();
-      this.#controller.onCloseCallout();
+      this.#infoWindow.close(); // close infoWindow for every click on Map (outside circle)
+      this.#controller.onCloseCallout(); // close callout
     })
   }
 
+  // render map to the given dom
   async render(mapDom, mapData) {
     await this.#initMap(mapDom, mapData);
     await this.#bindMapEvents();

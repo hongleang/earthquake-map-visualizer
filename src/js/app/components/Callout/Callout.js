@@ -1,16 +1,9 @@
 import { createElement } from "../../../utils/helper";
 
 export default class Callout {
-  #model;
   #content;
 
-  constructor() { }
-
-  setModel(model) {
-    this.#model = model;
-    this.#model.addObserver(this);
-  }
-
+  // Update callout every model change
   update(newData) {
     const { title, time, place, mag, type, code } = newData.feature;
     const date = new Date(time).toDateString();
@@ -41,16 +34,17 @@ export default class Callout {
   }
 
   openCallOut() {
-    this.aside.innerHTML = '';
+    this.aside.innerHTML = ''; // clear content to avoid multiple append
     this.aside.append(this.#content)
     this.aside.classList.add('active');
   }
 
   closeCallOut() {
     this.aside.classList.remove('active')
-    this.aside.innerHTML = '';
+    this.aside.innerHTML = ''; // clear content
   }
 
+  // Initial render callout
   render() {
     const el = createElement('aside');
     el.id = 'sidebar';
